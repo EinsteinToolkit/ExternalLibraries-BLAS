@@ -123,7 +123,7 @@ if [ "${BLAS_DIR}" != '/usr' -a "${BLAS_DIR}" != '/usr/local' ]; then
     BLAS_INC_DIRS=
     BLAS_LIB_DIRS="${BLAS_DIR}"
 fi
-BLAS_LIBS='blas'
+: ${BLAS_LIBS='blas'}
 
 # Pass options to Cactus
 echo "BEGIN MAKE_DEFINITION"
