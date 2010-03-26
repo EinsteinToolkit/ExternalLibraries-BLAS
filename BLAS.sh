@@ -92,7 +92,9 @@ if [ -z "${BLAS_DIR}" ]; then
         echo "BLAS: Building..."
         ${F77} ${F77FLAGS} -c *.f
         ${AR} ${ARFLAGS} blas.a *.o
-        ${RANLIB} ${RANLIBFLAGS} blas.a
+	if [ ${USE_RANLIB} = 'yes' ]; then
+	    ${RANLIB} ${RANLIBFLAGS} blas.a
+        fi
         
         echo "BLAS: Installing..."
         cp blas.a ${BLAS_DIR}
