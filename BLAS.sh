@@ -91,13 +91,13 @@ if [ -z "${BLAS_DIR}" ]; then
         
         echo "BLAS: Building..."
         ${F77} ${F77FLAGS} -c *.f
-        ${AR} ${ARFLAGS} blas.a *.o
+        ${AR} ${ARFLAGS} libblas.a *.o
 	if [ ${USE_RANLIB} = 'yes' ]; then
-	    ${RANLIB} ${RANLIBFLAGS} blas.a
+	    ${RANLIB} ${RANLIBFLAGS} libblas.a
         fi
         
         echo "BLAS: Installing..."
-        cp blas.a ${BLAS_DIR}
+        cp libblas.a ${BLAS_DIR}
         popd
         
         echo 'done' > done-${NAME}
