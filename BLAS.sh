@@ -61,7 +61,6 @@ if [ -z "${BLAS_DIR}" ]; then
 
     # Clean up environment
     unset LIBS
-    unset MAKEFLAGS
     
 (
     exec >&2                    # Redirect stdout to stderr
@@ -90,7 +89,10 @@ if [ -z "${BLAS_DIR}" ]; then
         pushd build-${NAME}/${TARNAME}/BLAS/SRC
         
         echo "BLAS: Building..."
-        ${F77} ${F77FLAGS} -c *.f
+        if [ $(basename "$F77") = 'xlf90_r' -o $(basename "$F77") = 'xlf90' ]; then
+            FIXEDF77FLAGS=-qfixed
+        fi
+        ${F77} ${F77FLAGS} ${FIXEDF77FLAGS} -c *.f
         ${AR} ${ARFLAGS} libblas.a *.o
 	if [ ${USE_RANLIB} = 'yes' ]; then
 	    ${RANLIB} ${RANLIBFLAGS} libblas.a
