@@ -89,7 +89,7 @@ if [ -z "${BLAS_DIR}" ]; then
         pushd build-${NAME}/${TARNAME}/BLAS/SRC
         
         echo "BLAS: Building..."
-        if [ $(basename "$F77") = 'xlf90_r' -o $(basename "$F77") = 'xlf90' ]; then
+        if echo ${F77} | grep -i xlf > /dev/null 2>&1; then
             FIXEDF77FLAGS=-qfixed
         fi
         ${F77} ${F77FLAGS} ${FIXEDF77FLAGS} -c *.f
