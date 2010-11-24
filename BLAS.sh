@@ -16,7 +16,7 @@ set -e                          # Abort on errors
 
 if [ -z "${BLAS_DIR}" ]; then
     echo "BEGIN MESSAGE"
-    echo "BLAS selected, but BLAS_DIR not set.  Checking some places..."
+    echo "BLAS selected, but BLAS_DIR not set. Checking some places..."
     echo "END MESSAGE"
     
     FILES="libblas.a libblas.so"
@@ -47,69 +47,90 @@ fi
 # Build
 ################################################################################
 
-if [ -z "${BLAS_DIR}" ]; then
+if [ -z "${BLAS_DIR}" -o "${BLAS_DIR}" = 'BUILD' ]; then
     echo "BEGIN MESSAGE"
     echo "Building BLAS..."
     echo "END MESSAGE"
     
     # Set locations
-    NAME=blas-3.2.1
-    TARNAME=lapack-3.2.1
+    THORN=BLAS
+    NAME=blas-3.2.2
+    TARNAME=lapack-3.2.2
     SRCDIR=$(dirname $0)
-    INSTALL_DIR=${SCRATCH_BUILD}
-    BLAS_DIR=${INSTALL_DIR}/${NAME}
-
-    # Clean up environment
-    unset LIBS
+    BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
+    INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
+    DONE_FILE=${SCRATCH_BUILD}/done/${THORN}
+    BLAS_DIR=${INSTALL_DIR}
     
 (
     exec >&2                    # Redirect stdout to stderr
     set -x                      # Output commands
     set -e                      # Abort on errors
-    cd ${INSTALL_DIR}
-    if [ -e done-${NAME} -a done-${NAME} -nt ${SRCDIR}/dist/${TARNAME}.tgz \
-                         -a done-${NAME} -nt ${SRCDIR}/BLAS.sh ]
+    cd ${SCRATCH_BUILD}
+    if [ -e ${DONE_FILE} -a ${DONE_FILE} -nt ${SRCDIR}/dist/${TARNAME}.tar.gz \
+                         -a ${DONE_FILE} -nt ${SRCDIR}/BLAS.sh ]
     then
         echo "BLAS: The enclosed BLAS library has already been built; doing nothing"
     else
         echo "BLAS: Building enclosed BLAS library"
         
-        echo "BLAS: Unpacking archive..."
-        rm -rf build-${NAME}
-        mkdir build-${NAME}
-        pushd build-${NAME}
+        # Should we use gmake or make?
+        MAKE=$(gmake --help > /dev/null 2>&1 && echo gmake || echo make)
         # Should we use gtar or tar?
         TAR=$(gtar --help > /dev/null 2> /dev/null && echo gtar || echo tar)
+        
+        # Set up environment
+        unset LIBS
+	if [ ${USE_RANLIB} != 'yes' ]; then
+            RANLIB=': ranlib'
+        fi
+        
+        echo "BLAS: Preparing directory structure..."
+        mkdir build external done 2> /dev/null || true
+        rm -rf ${BUILD_DIR} ${INSTALL_DIR}
+        mkdir ${BUILD_DIR} ${INSTALL_DIR}
+        
+        echo "BLAS: Unpacking archive..."
+        pushd ${BUILD_DIR}
         ${TAR} xzf ${SRCDIR}/dist/${TARNAME}.tgz
-        popd
         
         echo "BLAS: Configuring..."
-        rm -rf ${NAME}
-        mkdir ${NAME}
-        pushd build-${NAME}/${TARNAME}/BLAS/SRC
+        cd ${TARNAME}/BLAS/SRC
         
         echo "BLAS: Building..."
         if echo ${F77} | grep -i xlf > /dev/null 2>&1; then
             FIXEDF77FLAGS=-qfixed
         fi
-        ${F77} ${F77FLAGS} ${FIXEDF77FLAGS} -c *.f
-        ${AR} ${ARFLAGS} libblas.a *.o
-	if [ ${USE_RANLIB} = 'yes' ]; then
-	    ${RANLIB} ${RANLIBFLAGS} libblas.a
-        fi
+        #${F77} ${F77FLAGS} ${FIXEDF77FLAGS} -c *.f
+        #${AR} ${ARFLAGS} libblas.a *.o
+	#if [ ${USE_RANLIB} = 'yes' ]; then
+	#    ${RANLIB} ${RANLIBFLAGS} libblas.a
+        #fi
+        cat > make.cactus <<EOF
+SRCS = $(echo *.f)
+libblas.a: \$(SRCS:%.f=%.o)
+	${AR} ${ARFLAGS} \$@ \$^
+	${RANLIB} ${RANLIBFLAGS} \$@
+%.o: %.f
+	${F77} ${F77FLAGS} ${FIXEDF77FLAGS} -c \$*.f -o \$*.o
+EOF
+        ${MAKE} -f make.cactus
         
         echo "BLAS: Installing..."
         cp libblas.a ${BLAS_DIR}
         popd
         
-        echo 'done' > done-${NAME}
+        echo "BLAS: Cleaning up..."
+        rm -rf ${BUILD_DIR}
+        
+        date > ${DONE_FILE}
         echo "BLAS: Done."
     fi
 )
 
     if (( $? )); then
         echo 'BEGIN ERROR'
-        echo 'Error while building BLAS.  Aborting.'
+        echo 'Error while building BLAS. Aborting.'
         echo 'END ERROR'
         exit 1
     fi
