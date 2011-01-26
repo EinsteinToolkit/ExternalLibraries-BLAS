@@ -54,8 +54,8 @@ if [ -z "${BLAS_DIR}" -o "${BLAS_DIR}" = 'BUILD' ]; then
     
     # Set locations
     THORN=BLAS
-    NAME=blas-3.2.2
-    TARNAME=lapack-3.2.2
+    NAME=blas-3.3.0
+    TARNAME=lapack-3.3.0
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
