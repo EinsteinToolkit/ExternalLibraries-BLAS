@@ -144,7 +144,7 @@ fi
 ################################################################################
 
 # Set options
-if [ "${BLAS_DIR}" != '/usr' -a "${BLAS_DIR}" != '/usr/local' ]; then
+if [ "${BLAS_DIR}" != '/usr/lib' -a "${BLAS_DIR}" != '/usr/local/lib' ]; then
     BLAS_INC_DIRS=
     BLAS_LIB_DIRS="${BLAS_DIR}"
 fi
