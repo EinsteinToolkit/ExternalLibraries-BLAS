@@ -54,8 +54,8 @@ if [ -z "${BLAS_DIR}" -o "${BLAS_DIR}" = 'BUILD' ]; then
     
     # Set locations
     THORN=BLAS
-    NAME=blas-3.3.0
-    TARNAME=lapack-3.3.0
+    NAME=blas-3.3.1
+    TARNAME=lapack-3.3.1
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
@@ -73,11 +73,6 @@ if [ -z "${BLAS_DIR}" -o "${BLAS_DIR}" = 'BUILD' ]; then
         echo "BLAS: The enclosed BLAS library has already been built; doing nothing"
     else
         echo "BLAS: Building enclosed BLAS library"
-        
-        # Should we use gmake or make?
-        MAKE=$(gmake --help > /dev/null 2>&1 && echo gmake || echo make)
-        # Should we use gtar or tar?
-        TAR=$(gtar --help > /dev/null 2> /dev/null && echo gtar || echo tar)
         
         # Set up environment
         unset LIBS
