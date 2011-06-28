@@ -62,6 +62,13 @@ if [ -z "${BLAS_DIR}" -o "${BLAS_DIR}" = 'BUILD' ]; then
     DONE_FILE=${SCRATCH_BUILD}/done/${THORN}
     BLAS_DIR=${INSTALL_DIR}
     
+    if [ "${F77}" = "none" ]; then
+        echo 'BEGIN ERROR'
+        echo "Building BLAS requires a fortran compiler, but there is none configured: F77 = $F77.  Aborting."
+        echo 'END ERROR'
+        exit 1
+    fi
+
 (
     exec >&2                    # Redirect stdout to stderr
     set -x                      # Output commands
