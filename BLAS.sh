@@ -58,7 +58,17 @@ if [ -z "${BLAS_DIR}" -o "${BLAS_DIR}" = 'BUILD' ]; then
     TARNAME=lapack-3.3.1
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
-    INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
+    if [ -z "${BLAS_INSTALL_DIR}" ]; then
+        echo "BEGIN MESSAGE"
+        echo "BLAS install directory, BLAS_INSTALL_DIR, not set. Installing in the default configuration location. "
+        echo "END MESSAGE"
+     INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
+    else
+        echo "BEGIN MESSAGE"
+        echo "BLAS install directory, BLAS_INSTALL_DIR, selected. Installing BLAS at ${BLAS_INSTALL_DIR} "
+        echo "END MESSAGE"
+     INSTALL_DIR=${BLAS_INSTALL_DIR}
+    fi
     DONE_FILE=${SCRATCH_BUILD}/done/${THORN}
     BLAS_DIR=${INSTALL_DIR}
     
