@@ -47,7 +47,9 @@ fi
 # Build
 ################################################################################
 
-if [ -z "${BLAS_DIR}" -o "${BLAS_DIR}" = 'BUILD' ]; then
+if [ -z "${BLAS_DIR}"                                                   \
+     -o "$(echo "${BLAS_DIR}" | tr '[a-z]' '[A-Z]')" = 'BUILD' ]
+then
     echo "BEGIN MESSAGE"
     echo "Building BLAS..."
     echo "END MESSAGE"
