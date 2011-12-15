@@ -5,7 +5,9 @@
 ################################################################################
 
 # Set up shell
-set -x                          # Output commands
+if [ "$(echo ${VERBOSE} | tr '[:upper:]' '[:lower:]')" = 'yes' ]; then
+    set -x                      # Output commands
+fi
 set -e                          # Abort on errors
 
 
@@ -51,47 +53,52 @@ if [ -z "${BLAS_DIR}"                                                   \
      -o "$(echo "${BLAS_DIR}" | tr '[a-z]' '[A-Z]')" = 'BUILD' ]
 then
     echo "BEGIN MESSAGE"
-    echo "Building BLAS..."
+    echo "Using bundled BLAS..."
     echo "END MESSAGE"
     
     # Set locations
     THORN=BLAS
-    NAME=blas-3.3.1
-    TARNAME=lapack-3.3.1
+    NAME=blas-3.4.0
+    TARNAME=lapack-3.4.0
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     if [ -z "${BLAS_INSTALL_DIR}" ]; then
-        echo "BEGIN MESSAGE"
-        echo "BLAS install directory, BLAS_INSTALL_DIR, not set. Installing in the default configuration location. "
-        echo "END MESSAGE"
-     INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
+        INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
     else
         echo "BEGIN MESSAGE"
-        echo "BLAS install directory, BLAS_INSTALL_DIR, selected. Installing BLAS at ${BLAS_INSTALL_DIR} "
+        echo "Installing BLAS into ${BLAS_INSTALL_DIR}"
         echo "END MESSAGE"
-     INSTALL_DIR=${BLAS_INSTALL_DIR}
+        INSTALL_DIR=${BLAS_INSTALL_DIR}
     fi
     DONE_FILE=${SCRATCH_BUILD}/done/${THORN}
     BLAS_DIR=${INSTALL_DIR}
     
     if [ "${F77}" = "none" ]; then
         echo 'BEGIN ERROR'
-        echo "Building BLAS requires a fortran compiler, but there is none configured: F77 = $F77.  Aborting."
+        echo "Building BLAS requires a Fortran compiler, but there is none configured: F77='${F77}'. Aborting."
         echo 'END ERROR'
         exit 1
     fi
 
-(
-    exec >&2                    # Redirect stdout to stderr
-    set -x                      # Output commands
-    set -e                      # Abort on errors
-    cd ${SCRATCH_BUILD}
     if [ -e ${DONE_FILE} -a ${DONE_FILE} -nt ${SRCDIR}/dist/${TARNAME}.tar.gz \
                          -a ${DONE_FILE} -nt ${SRCDIR}/BLAS.sh ]
     then
-        echo "BLAS: The enclosed BLAS library has already been built; doing nothing"
+        echo "BEGIN MESSAGE"
+        echo "BLAS has already been built; doing nothing"
+        echo "END MESSAGE"
     else
-        echo "BLAS: Building enclosed BLAS library"
+        echo "BEGIN MESSAGE"
+        echo "Building BLAS"
+        echo "END MESSAGE"
+        
+        # Build in a subshell
+        (
+        exec >&2                # Redirect stdout to stderr
+        if [ "$(echo ${VERBOSE} | tr '[:upper:]' '[:lower:]')" = 'yes' ]; then
+            set -x              # Output commands
+        fi
+        set -e                  # Abort on errors
+        cd ${SCRATCH_BUILD}
         
         # Set up environment
         unset LIBS
@@ -139,16 +146,16 @@ EOF
         
         date > ${DONE_FILE}
         echo "BLAS: Done."
+        
+        )
+        if (( $? )); then
+            echo 'BEGIN ERROR'
+            echo 'Error while building BLAS. Aborting.'
+            echo 'END ERROR'
+            exit 1
+        fi
     fi
-)
-
-    if (( $? )); then
-        echo 'BEGIN ERROR'
-        echo 'Error while building BLAS. Aborting.'
-        echo 'END ERROR'
-        exit 1
-    fi
-
+    
 fi
 
 
