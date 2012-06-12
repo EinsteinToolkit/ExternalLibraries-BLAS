@@ -81,7 +81,7 @@ then
     fi
 
     if [ -e ${DONE_FILE} -a ${DONE_FILE} -nt ${SRCDIR}/dist/${TARNAME}.tar.gz \
-                         -a ${DONE_FILE} -nt ${SRCDIR}/BLAS.sh ]
+                         -a ${DONE_FILE} -nt ${SRCDIR}/configure.sh ]
     then
         echo "BEGIN MESSAGE"
         echo "BLAS has already been built; doing nothing"
