@@ -113,7 +113,7 @@ then
         
         echo "BLAS: Unpacking archive..."
         pushd ${BUILD_DIR}
-        ${TAR} xzf ${SRCDIR}/dist/${TARNAME}.tgz
+        ${TAR?} xzf ${SRCDIR}/dist/${TARNAME}.tgz
         
         echo "BLAS: Configuring..."
         cd ${TARNAME}/BLAS/SRC
