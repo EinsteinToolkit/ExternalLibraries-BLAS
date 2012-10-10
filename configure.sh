@@ -58,8 +58,10 @@ then
     
     # Set locations
     THORN=BLAS
-    NAME=blas-3.4.1
-    TARNAME=lapack-3.4.1
+    #NAME=blas-3.4.1
+    #TARNAME=lapack-3.4.1
+    NAME=blas-3.4.2
+    TARNAME=lapack-3.4.2
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     if [ -z "${BLAS_INSTALL_DIR}" ]; then
