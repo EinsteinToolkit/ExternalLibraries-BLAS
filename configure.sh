@@ -146,7 +146,6 @@ EOF
         
         date > ${DONE_FILE}
         echo "BLAS: Done."
-        
         )
         if (( $? )); then
             echo 'BEGIN ERROR'
