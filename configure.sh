@@ -16,7 +16,9 @@ set -e                          # Abort on errors
 # Search
 ################################################################################
 
-if [ -z "${BLAS_DIR}" ]; then
+if [ -z "${BLAS_DIR}" \
+     -o "$(echo "${BLAS_DIR}" | tr '[a-z]' '[A-Z]')" = 'NO_BUILD' ] 
+then
     echo "BEGIN MESSAGE"
     echo "BLAS selected, but BLAS_DIR not set. Checking some places..."
     echo "END MESSAGE"
