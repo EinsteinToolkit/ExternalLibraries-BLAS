@@ -164,9 +164,11 @@ fi
 ################################################################################
 
 # Set options
-if [ "${BLAS_DIR}" != '/usr/lib' -a "${BLAS_DIR}" != '/usr/local/lib' ]; then
-    BLAS_INC_DIRS=
-    BLAS_LIB_DIRS="${BLAS_DIR}"
+if [ "${BLAS_DIR}" != '/usr/lib' -a "${BLAS_DIR}" != '/usr/local/lib' -a \
+     "${BLAS_DIR}" != 'NO_BUILD' ]
+then
+    : ${BLAS_INC_DIRS=}
+    : ${BLAS_LIB_DIRS="${BLAS_DIR}"}
 fi
 : ${BLAS_LIBS='blas'}
 
