@@ -136,7 +136,10 @@ then
         cd ${TARNAME}/BLAS/SRC
         
         echo "BLAS: Building..."
-        if echo ${F77} | grep -i xlf > /dev/null 2>&1; then
+        #if echo ${F77} | grep -i xlf > /dev/null 2>&1; then
+        #    FIXEDF77FLAGS=-qfixed
+        #fi
+        if ${F77} -qversion 2>/dev/null | grep -q 'IBM XL Fortran'; then
             FIXEDF77FLAGS=-qfixed
         fi
         #${F77} ${F77FLAGS} ${FIXEDF77FLAGS} -c *.f
