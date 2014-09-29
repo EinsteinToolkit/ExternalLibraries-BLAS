@@ -22,7 +22,7 @@ if [ -z "${BLAS_DIR}" ]; then
     echo "END MESSAGE"
     
     FILES="libblas.a libblas.so"
-    DIRS="/usr/lib /usr/lib64 /usr/local/lib /usr/lib/atlas /usr/lib64/atlas ${HOME}"
+    DIRS="/usr/lib64 /usr/lib /usr/local/lib64 /usr/local/lib /usr/lib64/atlas /usr/lib/atlas /usr/lib64/atlas-base/atlas /usr/lib/atlas-base/atlas ${HOME}"
     for file in $FILES; do
         for dir in $DIRS; do
             if test -r "$dir/$file"; then
