@@ -77,7 +77,7 @@ then
     THORN=BLAS
     NAME=blas-3.4.2
     TARNAME=lapack-3.4.2
-    SRCDIR=$(dirname $0)
+    SRCDIR="$(dirname $0)"
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     if [ -z "${BLAS_INSTALL_DIR}" ]; then
         INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
@@ -184,17 +184,17 @@ fi
 ################################################################################
 
 # Set options
-if [ "${BLAS_DIR}" != '/usr/lib' -a "${BLAS_DIR}" != '/usr/local/lib' -a \
-     "${BLAS_DIR}" != 'NO_BUILD' ]
-then
+if [ "${BLAS_DIR}" != 'NO_BUILD' ]; then
     : ${BLAS_INC_DIRS=}
     : ${BLAS_LIB_DIRS="${BLAS_DIR}"}
 fi
 : ${BLAS_LIBS='blas'}
 
+BLAS_INC_DIRS="$(${CCTK_HOME}/lib/sbin/strip-incdirs.sh ${BLAS_INC_DIRS})"
+BLAS_LIB_DIRS="$(${CCTK_HOME}/lib/sbin/strip-libdirs.sh ${BLAS_LIB_DIRS})"
+
 # Pass options to Cactus
 echo "BEGIN MAKE_DEFINITION"
-echo "HAVE_BLAS     = 1"
 echo "BLAS_DIR      = ${BLAS_DIR}"
 echo "BLAS_INC_DIRS = ${BLAS_INC_DIRS}"
 echo "BLAS_LIB_DIRS = ${BLAS_LIB_DIRS}"
