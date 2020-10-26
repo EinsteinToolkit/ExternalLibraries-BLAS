@@ -28,7 +28,7 @@ fi
 # Try to find the library if build isn't explicitly requested
 if [ -z "${BLAS_BUILD}" ]; then
     for pkgname in blas blas-openblas blas-atlas blas-netlib ; do
-        find_lib BLAS $pkgname 1 "" "blas" "" "${BLAS_INPUT_DIR}"
+        find_lib BLAS $pkgname 1 "" "blas" "" "${BLAS_DIR}"
         if [ -n "${BLAS_DIR}" ]; then
             break
         fi
