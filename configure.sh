@@ -10,36 +10,47 @@ if [ "$(echo ${VERBOSE} | tr '[:upper:]' '[:lower:]')" = 'yes' ]; then
 fi
 set -e                          # Abort on errors
 
-. $CCTK_HOME/lib/make/bash_utils.sh
+
 
 ################################################################################
 # Search
 ################################################################################
 
-# Take care of requests to build the library in any case
-BLAS_DIR_INPUT=$BLAS_DIR
-if [ "$(echo "${BLAS_DIR}" | tr '[a-z]' '[A-Z]')" = 'BUILD' ]; then
-    BLAS_BUILD=yes
-    BLAS_DIR=
-else
-    BLAS_BUILD=
+if [ -z "${BLAS_DIR}" ]; then
+    echo "BEGIN MESSAGE"
+    echo "BLAS selected, but BLAS_DIR not set. Checking some places..."
+    echo "END MESSAGE"
+    
+    FILES="libblas.a libblas.so"
+    DIRS="/usr/lib64 /usr/lib /usr/local/lib64 /usr/local/lib /usr/lib64/atlas /usr/lib/atlas /usr/lib64/atlas-base/atlas /usr/lib/atlas-base/atlas ${HOME}"
+    for file in $FILES; do
+        for dir in $DIRS; do
+            if test -r "$dir/$file"; then
+                BLAS_DIR="$dir"
+                break
+            fi
+        done
+    done
+    
+    if [ -z "$BLAS_DIR" ]; then
+        echo "BEGIN MESSAGE"
+        echo "BLAS not found"
+        echo "END MESSAGE"
+    else
+        echo "BEGIN MESSAGE"
+        echo "Found BLAS in ${BLAS_DIR}"
+        echo "END MESSAGE"
+    fi
 fi
 
-# Try to find the library if build isn't explicitly requested
-if [ -z "${BLAS_BUILD}" ]; then
-    for pkgname in blas blas-openblas blas-atlas blas-netlib ; do
-        find_lib BLAS $pkgname 1 "" "blas" "" "${BLAS_INPUT_DIR}"
-        if [ -n "${BLAS_DIR}" ]; then
-            break
-        fi
-    done
-fi
+
 
 ################################################################################
 # Build
 ################################################################################
 
-if [ -n "$BLAS_BUILD" -o -z "${BLAS_DIR}" ]
+if [ -z "${BLAS_DIR}"                                                   \
+     -o "$(echo "${BLAS_DIR}" | tr '[a-z]' '[A-Z]')" = 'BUILD' ]
 then
     echo "BEGIN MESSAGE"
     echo "Using bundled BLAS..."
@@ -78,9 +89,6 @@ then
     fi
     DONE_FILE=${SCRATCH_BUILD}/done/${THORN}
     BLAS_DIR=${INSTALL_DIR}
-    BLAS_LIBS='blas'
-    BLAS_INC_DIRS=
-    BLAS_LIB_DIRS=${BLAS_DIR}/lib
     
     if [ "${F77}" = "none" ]; then
         echo 'BEGIN ERROR'
@@ -174,6 +182,16 @@ fi
 ################################################################################
 # Configure Cactus
 ################################################################################
+
+# Set options
+if [ "${BLAS_DIR}" != 'NO_BUILD' ]; then
+    : ${BLAS_INC_DIRS=}
+    : ${BLAS_LIB_DIRS="${BLAS_DIR}"}
+fi
+: ${BLAS_LIBS='blas'}
+
+BLAS_INC_DIRS="$(${CCTK_HOME}/lib/sbin/strip-incdirs.sh ${BLAS_INC_DIRS})"
+BLAS_LIB_DIRS="$(${CCTK_HOME}/lib/sbin/strip-libdirs.sh ${BLAS_LIB_DIRS})"
 
 # Pass options to Cactus
 echo "BEGIN MAKE_DEFINITION"
