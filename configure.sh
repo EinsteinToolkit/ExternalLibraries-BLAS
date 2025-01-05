@@ -75,8 +75,8 @@ then
 
     # Set locations
     THORN=BLAS
-    NAME=blas-3.4.2
-    TARNAME=lapack-3.4.2
+    NAME=blas-3.12.0
+    TARNAME=lapack-3.12.0
     SRCDIR="$(dirname $0)"
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     if [ -z "${BLAS_INSTALL_DIR}" ]; then
@@ -133,29 +133,19 @@ then
         ${TAR?} xzf ${SRCDIR}/dist/${TARNAME}.tgz
         
         echo "BLAS: Configuring..."
-        cd ${TARNAME}/BLAS/SRC
+        cd ${TARNAME}
         
         echo "BLAS: Building..."
-        #if echo ${F77} | grep -i xlf > /dev/null 2>&1; then
-        #    FIXEDF77FLAGS=-qfixed
-        #fi
-        if ${F77} -qversion 2>/dev/null | grep -q 'IBM XL Fortran'; then
-            FIXEDF77FLAGS=-qfixed
-        fi
-        #${F77} ${F77FLAGS} ${FIXEDF77FLAGS} -c *.f
-        #${AR} ${ARFLAGS} libblas.a *.o
-	#if [ ${USE_RANLIB} = 'yes' ]; then
-	#    ${RANLIB} ${RANLIBFLAGS} libblas.a
-        #fi
-        cat > make.cactus <<EOF
-SRCS = $(echo *.f)
-libblas.a: \$(SRCS:%.f=%.o)
-	${AR} ${ARFLAGS} \$@ \$^
-	${RANLIB} ${RANLIBFLAGS} \$@
-%.o: %.f
-	${F77} ${F77FLAGS} ${FIXEDF77FLAGS} -c \$*.f -o \$*.o
+        cat > make.inc <<EOF
+FC = $F90
+FFLAGS = $F90FLAGS
+FFLAGS_DRV = \$(FFLAGS)
+TIMER = NONE
+
+BLASLIB      = \$(TOPSRCDIR)/libblas.a
+LAPACKLIB    = \$(TOPSRCDIR)/liblapack.a
 EOF
-        ${MAKE} -f make.cactus
+        ${MAKE} blaslib
         
         echo "BLAS: Installing..."
         cp libblas.a ${BLAS_DIR}
